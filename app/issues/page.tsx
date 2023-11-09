@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react'
-import { Table } from '@radix-ui/themes'
+import { Box, Table } from '@radix-ui/themes'
 import Link from '../components/Link';
 import prisma from '@/prisma/client';
 import IssueStatusBadge from '../components/IssueStatusBadge';
@@ -13,7 +13,7 @@ const IssuesPage = async () => {
   await delay(2000);
   
   return (
-    <div>
+    <Box>
       <Table.Root variant="surface">
         <Table.Header>
           <Table.Row>
@@ -38,8 +38,8 @@ const IssuesPage = async () => {
         </Table.Body>
       </Table.Root>
       <IssueActions />
-    </div>
-  );
+    </Box>
+  )
 };
 
 export default IssuesPage
