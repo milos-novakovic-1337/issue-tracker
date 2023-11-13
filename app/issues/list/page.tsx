@@ -13,7 +13,6 @@ interface Props {
   searchParams: { status: Status, orderBy: keyof Issue }
 }
 
-
 const IssuesPage = async ({ searchParams } : Props) => {
   const columns: { label: string; value: keyof Issue; className?: string; }[] = [
     { label: 'Issue', value: 'title'},
