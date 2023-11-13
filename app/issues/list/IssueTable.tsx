@@ -5,6 +5,8 @@ import Link from 'next/link'
 import React from 'react'
 import NextLink from 'next/link';
 import { Issue, Status } from '@prisma/client'
+
+
 export interface IssueQuery {
     status: Status;
     orderBy: keyof Issue;
