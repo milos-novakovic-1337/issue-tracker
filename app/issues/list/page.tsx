@@ -1,36 +1,25 @@
-'use client';
+"use client";
 
-import prisma from '@/prisma/client';
-import { Box, Table, TableColumnHeaderCell } from '@radix-ui/themes';
-import { IssueStatusBadge, Link } from '@/app/components';
-import IssueActions from './IssueActions';
-import { Issue, Status } from '@prisma/client';
-import NextLink from 'next/link'
-import { ArrowUpIcon } from '@radix-ui/react-icons';
-import Pagination from '@/app/components/Pagination';
-
+import Pagination from "@/app/components/Pagination";
+import prisma from "@/prisma/client";
+import { Status } from "@prisma/client";
+import IssueActions from "./IssueActions";
+import IssueTable, { IssueQuery, columnNames } from "./IssueTable";
+import { Flex } from "@radix-ui/themes";
 
 interface Props {
-  searchParams: { status: Status, orderBy: keyof Issue, page: string }
+  searchParams: IssueQuery;
+}
 
-};
-
-const IssuesPage = async ({ searchParams } : Props) => {
-  const columns: { label: string; value: keyof Issue; className?: string; }[] = [
-    { label: 'Issue', value: 'title'},
-    { label: 'Status', value: 'status', className: "hidden md:table-cell"},
-    { label: 'Created', value: 'createdAt', className: "hidden md:table-cell"}
-  ];
+const IssuesPage = async ({ searchParams }: Props) => {
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
   const where = { status };
 
-  const orderBy = columns
-    .map(column => column.value)
-    .includes(searchParams.orderBy)
-    ? { [searchParams.orderBy]: 'asc'}
+  const orderBy = columnNames.includes(searchParams.orderBy)
+    ? { [searchParams.orderBy]: "asc" }
     : undefined;
   const page = parseInt(searchParams.page) || 1;
   const pageSize = 10;
@@ -38,59 +27,26 @@ const IssuesPage = async ({ searchParams } : Props) => {
     where,
     orderBy,
     skip: (page - 1) * pageSize,
-    take: pageSize
+    take: pageSize,
   });
   const issueCount = await prisma.issue.count({ where });
   return (
-    <Box>
-      <Table.Root variant="surface">
-        <Table.Header>
-          <Table.Row>
-            {columns.map((column) => (
-              <TableColumnHeaderCell
-                key={column.value}
-                className={column.className}
-              >
-                <NextLink
-                  href={{ query: { ...searchParams, orderBy: column.value } }}
-                >
-                  {column.label}
-                </NextLink>{" "}
-                {column.value === searchParams.orderBy && (
-                  <ArrowUpIcon className="inline" />
-                )}
-              </TableColumnHeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {filteredIssues.map((issue) => (
-            <Table.Row key={issue.id}>
-              <Table.Cell>
-                <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
-              </Table.Cell>
-              <div className="block md:hidden">
-                <IssueStatusBadge status={issue.status} />
-              </div>
-              <Table.Cell className="hidden md:table-cell">
-                <IssueStatusBadge status={issue.status} />
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {issue.createdAt.toDateString()}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
-      <Pagination 
-          pageSize={pageSize}
-          currentPage={page}
-          itemCount={issueCount}></Pagination>
+    <Flex direction="column" gap="3">
+      <IssueTable
+        searchParams={searchParams}
+        issues={filteredIssues}
+      >
+      </IssueTable>
+      <Pagination
+        pageSize={pageSize}
+        currentPage={page}
+        itemCount={issueCount}
+      ></Pagination>
       <IssueActions />
-    </Box>
+    </Flex>
   );
 };
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-export default IssuesPage
+export default IssuesPage;
