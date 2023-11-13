@@ -4,8 +4,8 @@ import React from 'react'
 import { IssueStatusBadge } from './components';
 import Link from 'next/link';
 
-const LatestIssues = () => {
-  const issues = prisma.issue.findMany({
+const LatestIssues = async () => {
+  const issues = await prisma.issue.findMany({
     orderBy: { createdAt: 'desc' },
     take: 5,
     include: {
@@ -27,7 +27,7 @@ const LatestIssues = () => {
                             <IssueStatusBadge status={issue.status}/>
             </Flex>
             {issue.assignedToUserId && (
-                <Avatar src={issue.assignedToUser.image!} fallback={'?'}/>
+                <Avatar src={issue.assignedToUser?.image!} fallback={'?'}/>
                 )}
             </Flex>
                     </Table.Cell>
